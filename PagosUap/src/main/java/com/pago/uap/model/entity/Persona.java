@@ -33,7 +33,6 @@ public class Persona implements Serializable{
     
     @NotNull(message = "El campo no puede estar vacio")
     @NotBlank(message = "Favor introducir CI")
-    
     @Size(min = 1, max = 12, message = "El ci debe medir entre 1 y 10 digitos")
     @Column(unique = true)
     @Pattern(regexp = "^[0-9]+(?:-[0-9][A-Z])?", message = "El ci solo debe tener numeros mas complemento en MAYUSCULA si se requiere")
@@ -42,17 +41,19 @@ public class Persona implements Serializable{
     @NotBlank(message = "Favor introducir Nombre")
     @Size(min = 1, max = 50, message = "El nombre debe medir entre 1 y 50 digitos")
     @Column
-    @Pattern(regexp = "^[A-Z]+(?:[ A-Z])?", message = "El ci solo debe tener numeros mas complemento en MAYUSCULA si se requiere")
+    @Pattern(regexp = "^[A-Z]+(\\s?[A-Z]+)?+(\\s?[A-Z]+)?", message = "El Nombre tiene que estar en MAYUSCULA(S)")
     private String nombre_persona;
     @NotNull(message = "El campo no puede estar vacio")
     @NotBlank(message = "Favor introducir Ap paterno")
     @Size(min = 1, max = 50, message = "El Ap paterno debe medir entre 1 y 50 digitos")
     @Column
+    @Pattern(regexp = "^[A-Z]+(\\s?[A-Z]+)?+(\\s?[A-Z]+)?", message = "El Ap. paterno tiene que estar en MAYUSCULA(S)")
     private String ap_paterno_persona;
     @NotNull(message = "El campo no puede estar vacio")
     @NotBlank(message = "Favor introducir Ap materno")
     @Size(min = 1, max = 50, message = "El Ap materno debe medir entre 1 y 50 digitos")
     @Column
+    @Pattern(regexp = "^[A-Z]+(\\s?[A-Z]+)?+(\\s?[A-Z]+)?", message = "El Ap. materno tiene que estar en MAYUSCULA(S)")
     private String ap_materno_persona;
     @Column
     private String nombre_completo_persona;

@@ -51,7 +51,7 @@ public class homeController {
         } catch (Exception e) {
             System.out.println("ya existe ci");
             redirectAttrs
-            .addFlashAttribute("mensaje", "El ci ya se encuentra en la base de datos")
+            .addFlashAttribute("mensaje", "El ci "+persona.getCi_persona()+" se encuentra registrado!")
             .addFlashAttribute("clase", "danger alert-dismissible fade show");
             return "redirect:/home";
         }
