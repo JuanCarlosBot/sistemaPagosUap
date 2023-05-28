@@ -1,70 +1,194 @@
 package com.pago.uap.controller;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.pago.uap.model.entity.Cargo;
+import com.pago.uap.model.entity.EstadoPago;
+import com.pago.uap.model.entity.Gestion;
+import com.pago.uap.model.entity.Localidad;
 import com.pago.uap.model.entity.Persona;
+import com.pago.uap.model.entity.TipoCargo;
+import com.pago.uap.model.entity.Usuario;
+import com.pago.uap.model.service.ICargoService;
+import com.pago.uap.model.service.IEstadoPagoService;
+import com.pago.uap.model.service.IGestionService;
+import com.pago.uap.model.service.ILocalidadService;
+import com.pago.uap.model.service.IMunicipioService;
 import com.pago.uap.model.service.IPersonaService;
+import com.pago.uap.model.service.ITipoCargoService;
+import com.pago.uap.model.service.ITipoLocalidadService;
 
 @Controller
 public class homeController {
     
     @Autowired
     private IPersonaService personaService;
+    @Autowired
+    private IMunicipioService municipioService;
+    @Autowired
+    private ITipoLocalidadService tipoLocalidadService;
+    @Autowired
+    private ILocalidadService localidadService;
+    @Autowired
+    private ICargoService cargoService;
+    @Autowired
+    private IEstadoPagoService estadoPagoService;
+    @Autowired
+    private ITipoCargoService tipoCargoService;
+    @Autowired
+    private IGestionService gestionService;
 
-    @GetMapping(value = "/home")
-    public String PersonaFormulario(Model model){
-        model.addAttribute("persona", new Persona());
-        model.addAttribute("listaPersonas", personaService.listaPersonasAll());
-        return "persona/persona";
+    @GetMapping(value = "/persona")
+    public String PersonaFormulario(Model model, HttpServletRequest request){
+        if(request.getSession().getAttribute("usuario")!=null){
+            Usuario usuario = (Usuario)request.getSession().getAttribute("usuario");
+            
+            model.addAttribute("usuario", usuario);
+            model.addAttribute("persona", new Persona());
+            model.addAttribute("listaPersonas", personaService.listaPersonasAll());
+            model.addAttribute("municipios", municipioService.listaMunicipiosAll());
+            model.addAttribute("tipoCargos", tipoCargoService.listaTipoCargosAll());
+            return "persona/persona";
+        /*for (int i = 0; i < 3000; i++) {
+            try {
+                Cargo cargo = new Cargo();
+            cargo.setFecha_inicio(new Date());
+                cargoService.guardarCargo(cargo);
+                System.out.println(cargo.getId_cargo()+" iddddddddddddddd");
+            } catch (Exception e) {
+                // TODO: handle exception
+            }
+        }*/
+        }else{
+            return "redirect:/login";
+        }
     }
     @GetMapping(value = "/personasAll")
-    public String PersonasAll(Model model){
-        model.addAttribute("listaPersonas", personaService.listaPersonasAll());
-        return "persona/personasAll";
+    public String PersonasAll(Model model, HttpServletRequest request){
+        if(request.getSession().getAttribute("usuario")!=null){
+            Usuario usuario = (Usuario)request.getSession().getAttribute("usuario");
+            
+            model.addAttribute("usuario", usuario);
+            model.addAttribute("listaPersonas", personaService.listaPersonasAll());
+            model.addAttribute("localidades", localidadService.listaLocalidadesAll());
+            return "persona/personasAll";
+        }else{
+            return "redirect:/login";
+        }
+        
     }
 
     @PostMapping("/guardarPersona")
-    public String guardarPersona(@ModelAttribute @Valid Persona persona, BindingResult bindingResult, RedirectAttributes redirectAttrs){
+    public String guardarPersona(@ModelAttribute("persona") @Valid Persona persona, 
+     BindingResult bindingResult, RedirectAttributes redirectAttrs, HttpServletRequest request, Model model){
+        Usuario usuario = (Usuario)request.getSession().getAttribute("usuario");
+            
         try {
             if (bindingResult.hasErrors()) {
+                List<ObjectError> errors = bindingResult.getAllErrors();
+            for (ObjectError error : errors) {
+                System.out.println(error.getDefaultMessage());
+                
+            }
                 // Aquí se puede hacer cualquier cosa, yo hago una redirección para mostrar los errores en el form
+                model.addAttribute("usuario", usuario);
+                model.addAttribute("municipios", municipioService.listaMunicipiosAll());
+                model.addAttribute("tipoCargos", tipoCargoService.listaTipoCargosAll());
                 return "persona/persona";
             }
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(new Date());
+            int year = calendar.get(Calendar.YEAR);
+            String anioActual=year+"";
+            Gestion gestionA;
+            boolean encontrada = false;
+            for (Gestion palabra : gestionService.listaGestionesAll()) {
+                if (palabra.getNombre_gestion().equals(anioActual)) {
+                    encontrada = true;break;
+                }
+            }
+            if (encontrada) {
+                Gestion gestion1 = gestionService.sacarGestionPorNombre(anioActual);
+                gestionA=gestion1;
+            } else {
+                Gestion gestion = new Gestion();
+                gestion.setNombre_gestion(anioActual);
+                gestionService.guardarGestion(gestion);
+                gestionA=gestion;
+            }
+
+            String id_tipo_carg = request.getParameter("id_tipo_cargo");
+            long id_tipo_cargo=Long.parseLong(id_tipo_carg);
+            
+            TipoCargo tipoCargo = tipoCargoService.sacarIdTipoCargo(id_tipo_cargo);
+
+            EstadoPago estadoPago = estadoPagoService.sacarIdEstadoPago(2l);
+ 
+            Cargo cargo = new Cargo();
+            cargo.setFecha_inicio(new Date());
+            cargo.setEstadoPago(estadoPago);
+            cargo.setTipoCargo(tipoCargo);
+            cargo.setGestion(gestionA);
+            cargoService.guardarCargo(cargo);
+            cargoService.guardarCargo(cargo);
+
+            persona.setNombre_completo_persona(persona.getAp_paterno_persona()+" "+persona.getAp_materno_persona()+" "+persona.getNombre_persona());
+            persona.setFecha_registro_persona(new Date());
+            persona.setEstado_persona("A");
+            persona.setCargo(cargo);
             personaService.guardarPersona(persona);
             redirectAttrs
                 .addFlashAttribute("mensaje", "Se guardo correctamente la persona")
                 .addFlashAttribute("clase", "success alert-dismissible fade show");
             
-            return "redirect:/home";  
+            return "redirect:/persona";  
         } catch (Exception e) {
             System.out.println("ya existe ci");
             redirectAttrs
-            .addFlashAttribute("mensaje", "El ci "+persona.getCi_persona()+" se encuentra registrado!")
+            .addFlashAttribute("mensaje", "El ci "+persona.getCi_persona()+" ya se encuentra registrado!")
             .addFlashAttribute("clase", "danger alert-dismissible fade show");
-            return "redirect:/home";
+            return "redirect:/persona";
         }
         
     }
 
     @GetMapping(value="/modificarPersona/{id_persona}")
-    public String editarPersona(@PathVariable(value="id_persona")Long id_persona, Model model){
-        Persona persona = personaService.sacarIdPersona(id_persona);
-        model.addAttribute("editMode", "true");
-        model.addAttribute("persona", persona);
-        model.addAttribute("listaPersonas", personaService.listaPersonasAll());
-        return "persona/persona";
+    public String editarPersona(@PathVariable(value="id_persona")Long id_persona, Model model, HttpServletRequest request){
+        if(request.getSession().getAttribute("usuario")!=null){
+            Usuario usuario = (Usuario)request.getSession().getAttribute("usuario");
+            
+            model.addAttribute("usuario", usuario);Persona persona = personaService.sacarIdPersona(id_persona);
+            model.addAttribute("editMode", "true");
+            model.addAttribute("persona", persona);
+            model.addAttribute("listaPersonas", personaService.listaPersonasAll());
+            return "persona/persona";
+        }else{
+            return "redirect:/login";
+        }
     }
 
     @PostMapping("/guardarPersonaEditado")
@@ -81,11 +205,18 @@ public class homeController {
             .addFlashAttribute("mensaje", "Se actualizo correctamente la persona")
             .addFlashAttribute("clase", "success alert-dismissible fade show");
         
-        return "redirect:/home";
+        return "redirect:/persona";
     }
     
     @GetMapping("/cancelarEditPersona")
     public String cancelarEditPersona(){
-        return "redirect:/home";
+        return "redirect:/persona";
+    }
+
+    @RequestMapping(value = "/getLocalidades", method = RequestMethod.GET)
+    public @ResponseBody List<Localidad> findAllLocalidades(
+            @RequestParam(value = "municipioId", required = true) Long id_municipio) {
+        List<Localidad> localidades = localidadService.localidadesPorIdMunicipio(id_municipio);
+        return localidades;
     }
 }

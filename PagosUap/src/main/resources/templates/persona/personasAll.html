@@ -22,11 +22,16 @@
                                         <tr>
                                             <th>Nro</th>
                                             <th>CI</th>
-                                            <th>Nombre(s)</th>
-                                            <th>Ap paterno</th>
-                                            <th>Ap materno</th>
                                             <th>Nombre Completo</th>
-                                            <th>Opciones</th>
+                                            <th>Municipio</th>
+                                            <th>Localidad</th>
+                                            <th>Tipo l</th>
+                                            <th>Cargo</th>
+                                            <th>Año</th>
+                                            <!--<th>Nombre(s)</th>
+                                            <th>Ap paterno</th>
+                                            <th>Ap materno</th>-->
+                                            <th>+</th>
                                         </tr>
                                     </thead>
                                     <tfoot>
@@ -34,10 +39,15 @@
                                             <th>Nro</th>
                                             <th>CI</th>
                                             <th>Nombre Completo</th>
-                                            <th>Nombre(s)</th>
+                                            <th>Municipio</th>
+                                            <th>Localidad</th>
+                                            <th>Tipo l</th>
+                                            <th>Cargo</th>
+                                            <th>Año</th>
+                                            <!--<th>Nombre(s)</th>
                                             <th>Ap paterno</th>
-                                            <th>Ap materno</th>
-                                            <th>Opciones</th>
+                                            <th>Ap materno</th>-->
+                                            <th>+</th>
                                         </tr>
                                     </tfoot>
                                     <tbody>
@@ -45,9 +55,15 @@
                                             <td th:text="${g.index+1}"></td>
                                             <td th:text="${p.ci_persona}"></td>
                                             <td th:text="${p.nombre_completo_persona}"></td>
-                                            <td th:text="${p.nombre_persona}"></td>
+                                            <td th:text="${p.localidad.municipio.nombre_municipio}"></td>
+                                            <td th:text="${p.localidad.nombre_localidad}"></td>
+                                            <td th:text="${p.cargo.tipoCargo.nombre_tipo_cargo+'/'+p.localidad.tipoLocalidad.nombre_tipo_localidad}"></td>
+                                            <td th:text="${p.cargo.fecha_inicio}"></td>
+                                            <td th:text="${p.cargo.gestion.nombre_gestion}"></td>
+                                            <!--<td th:text="${p.nombre_persona}"></td>
                                             <td th:text="${p.ap_paterno_persona}"></td>
-                                            <td th:text="${p.ap_materno_persona}"></td>                                            
+                                            <td th:text="${p.ap_materno_persona}"></td>-->
+                                                                                        
                                             <td class="text-center">
                                                 <a th:href="@{'/modificarPersona/'+${p.id_persona}}" 
                                                     data-toggle="tooltip" data-placement="top" title="Editar"><i

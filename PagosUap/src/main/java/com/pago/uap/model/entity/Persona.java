@@ -11,6 +11,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -60,8 +62,10 @@ public class Persona implements Serializable{
     @Column
     private String estado_persona;
     @Column
+    @Temporal(TemporalType.DATE)
     private Date fecha_registro_persona;
     @Column
+    @Temporal(TemporalType.DATE)
     private Date fecha_mod_persona;
 
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})

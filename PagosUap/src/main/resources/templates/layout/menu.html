@@ -1,16 +1,16 @@
 <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar" th:fragment="menu">
 
     <!-- Sidebar - Brand -->
-    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+    <a class="sidebar-brand d-flex align-items-center justify-content-center" th:href="@{/persona}">
         <div class="sidebar-brand-icon rotate-n-15">
             <i class="fas fa-laugh-wink"></i>
         </div>
-        <div class="sidebar-brand-text mx-3">FUNA BOSQUE <sup></sup></div>
+        <div class="sidebar-brand-text mx-3">FONABOSQUE <sup></sup></div>
     </a>
 
     <hr class="sidebar-divider my-0">
     <li class="nav-item">
-        <a class="nav-link" th:href="@{/home}">
+        <a class="nav-link" th:href="@{/persona}">
             <i class="fas fa-fw fa-tachometer-alt"></i>
             <span>Dashboard</span></a>
     </li>
@@ -55,8 +55,8 @@
     </div>
     
 
-    <li class="nav-item  active">
-        <a class="nav-link" th:href="@{/home}">
+    <li class="nav-item">
+        <a class="nav-link" th:href="@{/persona}">
             <i class="fas fa-fw fa-edit"></i>
             <span>Todas las personas</span></a>
     </li>

@@ -16,6 +16,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -31,9 +33,8 @@ public class Cargo implements Serializable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id_cargo;
-    private String nombre_cargo;
-    private String descripcion;
     @Column
+    
     @Temporal(TemporalType.DATE)
     private Date fecha_inicio;
     @Column
@@ -53,4 +54,10 @@ public class Cargo implements Serializable{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_estado_pago")
     private EstadoPago estadoPago;
+    //@NotNull(message = "El campo id no puede estar vacio (tipo cargo)")
+    
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_tipo_cargo")
+    private TipoCargo tipoCargo;
 }
