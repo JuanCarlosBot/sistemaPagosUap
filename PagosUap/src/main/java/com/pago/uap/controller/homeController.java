@@ -62,7 +62,7 @@ public class homeController {
     @Autowired
     private IGestionService gestionService;
 
-    @GetMapping(value = "/persona")
+    @GetMapping(value = {"/", "/persona"})
     public String PersonaFormulario(Model model, HttpServletRequest request){
         if(request.getSession().getAttribute("usuario")!=null){
             Usuario usuario = (Usuario)request.getSession().getAttribute("usuario");
@@ -219,4 +219,7 @@ public class homeController {
         List<Localidad> localidades = localidadService.localidadesPorIdMunicipio(id_municipio);
         return localidades;
     }
+
+    	
+
 }
