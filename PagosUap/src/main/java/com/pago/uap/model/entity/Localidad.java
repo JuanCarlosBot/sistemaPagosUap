@@ -42,6 +42,7 @@ public class Localidad implements Serializable{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_tipo_localidad")
     private TipoLocalidad tipoLocalidad;
+    private String estado;
     
 
 }

@@ -27,6 +27,7 @@ public class Contrato implements Serializable{
     private Long id_contrato;
     @Column
     private String ruta;
+    private String estado;
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_persona")

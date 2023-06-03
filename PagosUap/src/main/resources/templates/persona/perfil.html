@@ -1,0 +1,97 @@
+<!-- Button trigger modal
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#ModificarPerfil">
+        Launch demo modal
+    </button> -->
+
+<!-- Modal -->
+<div class="modal fade" id="ModificarPerfil" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true" th:fragment="ModPerfil">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel" th:text="'Perfil de Usuario '+${usuario.usuario} "></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+                <div class="text-center">
+                    <h1 class="h4 text-gray-900 mb-5" th:text="'Modificar Perfil ' +${usuario.usuario}"> </h1>
+                </div>
+                <div class="alert" role="alert" style="display: none;" id="panelAlerta">
+                    <h6 class="alert-body" id="alerta"></h6>
+                    <button type="button" class="close" onclick="QuitarAlerta()">
+                    </button>
+                </div>
+                <form class="user" th:action="@{/EditarPerfil}" method="post" enctype="multipart/form-data">
+                    <div class="form-group row">
+                        <div class="rounded mx-auto d-block" style="
+                        width: 200px;
+                        height: 200px;
+                        position: relative;">
+                            <img th:src="${usuario.foto}" alt="Foto Perfil" class="rounded mx-auto d-block" style="width: 100%;
+                            height: 100%;
+                            object-fit: cover;">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <input type="file" name="fotoPerfil" id="fotoPerfil" accept="image/*"
+                            class="rounded mx-auto d-block">
+                    </div>
+                    <input type="hidden" name="id_user" th:field="${usuario.id_usuario}">
+                    <input type="hidden" th:field="${usuario.foto}">
+                    <div class="form-group row">
+                        <div class="col-md-5">
+                            <label for="">Nombre de Usuario <sup>(*)</sup></label>
+                            <input type="text" class="form-control form-control-user" placeholder="Nombre de Usuario"
+                                th:field="${usuario.nombre_usuario}">
+                            <div style="color: red;" th:errors="${usuario.nombre_usuario}"></div>
+                            <label for="">Contraseña de Usuario <sup>(*)</sup></label>
+                            <input type="text" class="form-control form-control-user"
+                                placeholder="Contraseña de Usuario" th:field="${usuario.password}">
+                            <div style="color: red;" th:errors="${usuario.password}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer" style="text-align: center;">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                        <input type="submit" class="btn btn-primary" value="Guardar Cambios" />
+                    </div>
+                </form>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('fotoPerfil');
+        var div = document.getElementById("panelAlerta");
+        var mensaje = document.getElementById("alerta");
+        fileInput.addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                const fileType = file.type;
+                if (fileType.startsWith('image/')) {
+                    //div.style.display = "block";// El archivo es una imagen
+                    //console.log('Archivo de imagen válido');
+                    div.style.display = "block";
+                    div.classList="alert alert-success"
+                    mensaje.textContent = "El archivo de Imagen se ha seccionado correctamente";
+                    
+                } else {
+                    // El archivo no es una imagen
+                    fileInput.value = ''; // Borrar el valor del campo de entrada
+                    div.style.display = "block";
+                    div.classList="alert alert-danger"
+                    mensaje.textContent = "El Archivo seccionado de imagen no es válido";
+                }
+            }
+        });
+    function QuitarAlerta() {
+        div.style.display = "none";
+    }
+    </script>
+</div>

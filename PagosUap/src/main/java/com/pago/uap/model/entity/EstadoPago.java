@@ -29,4 +29,5 @@ public class EstadoPago implements Serializable{
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "estadoPago", fetch = FetchType.LAZY)
 	private List<Cargo> cargos;
+    private String estado;
 }

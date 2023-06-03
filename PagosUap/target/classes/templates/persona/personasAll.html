@@ -12,75 +12,163 @@
                 <div class="container-fluid">
 
                     <div class="card shadow mb-4">
-                        <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">Registro de Personas</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                                    <thead>
-                                        <tr>
-                                            <th>Nro</th>
-                                            <th>CI</th>
-                                            <th>Nombre Completo</th>
-                                            <th>Municipio</th>
-                                            <th>Localidad</th>
-                                            <th>Tipo l</th>
-                                            <th>Cargo</th>
-                                            <th>Año</th>
-                                            <!--<th>Nombre(s)</th>
-                                            <th>Ap paterno</th>
-                                            <th>Ap materno</th>-->
-                                            <th>+</th>
-                                        </tr>
-                                    </thead>
-                                    <tfoot>
-                                        <tr>
-                                            <th>Nro</th>
-                                            <th>CI</th>
-                                            <th>Nombre Completo</th>
-                                            <th>Municipio</th>
-                                            <th>Localidad</th>
-                                            <th>Tipo l</th>
-                                            <th>Cargo</th>
-                                            <th>Año</th>
-                                            <!--<th>Nombre(s)</th>
-                                            <th>Ap paterno</th>
-                                            <th>Ap materno</th>-->
-                                            <th>+</th>
-                                        </tr>
-                                    </tfoot>
-                                    <tbody>
-                                        <tr th:each="p,g:${listaPersonas}">
-                                            <td th:text="${g.index+1}"></td>
-                                            <td th:text="${p.ci_persona}"></td>
-                                            <td th:text="${p.nombre_completo_persona}"></td>
-                                            <td th:text="${p.localidad.municipio.nombre_municipio}"></td>
-                                            <td th:text="${p.localidad.nombre_localidad}"></td>
-                                            <td th:text="${p.cargo.tipoCargo.nombre_tipo_cargo+'/'+p.localidad.tipoLocalidad.nombre_tipo_localidad}"></td>
-                                            <td th:text="${p.cargo.fecha_inicio}"></td>
-                                            <td th:text="${p.cargo.gestion.nombre_gestion}"></td>
-                                            <!--<td th:text="${p.nombre_persona}"></td>
-                                            <td th:text="${p.ap_paterno_persona}"></td>
-                                            <td th:text="${p.ap_materno_persona}"></td>-->
-                                                                                        
-                                            <td class="text-center">
-                                                <a th:href="@{'/modificarPersona/'+${p.id_persona}}" 
-                                                    data-toggle="tooltip" data-placement="top" title="Editar"><i
-                                                    class="far fa-edit"></i></a><!--editar-->
-                                                <a th:href="@{'/certificates/'+${p.id_persona}}" 
-                                                    data-toggle="tooltip" data-placement="top" title="Certificado"><i
-                                                    class="far fa-edit"></i></a><!--editar-->
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                        <form th:action="@{/GenerarContratosAll}" method="post">
+                            <div th:class="'alert alert-' + (${clase != null} ? ${clase} : info)" role="alert"
+                                th:if="${mensaje != null}">
+                                <h4 class="alert-body" th:text="${mensaje}"></h4>
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
                             </div>
-                        </div>
+                            <div class="card-header py-3">
+                                
+                                <div class="form-group row">
+                                    <div class="col-md-3">
+                                        <div style="text-align: left;">
+                                            <h4 class="m-0 font-weight-bold text-primary">Personas</h4>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row col-md-9">
+                                        <label class="col-form-label">Fecha inicio</label>
+                                        <div class="col-sm-3 col-md-3">
+                                            <input class="form-control" type="date" name="fecha_inicio" required>
+                                        </div>
+                                        <label class="col-form-label">Fecha fin</label>
+                                        <div class="col-sm-3 col-md-3">
+                                            <input class="form-control" type="date" name="fecha_fin" required>
+                                        </div>
+                                        <div class="col-sm-3 col-md-3" style="text-align: left;">
+                                            <input type="submit" class="btn btn-primary" value="Generar Contratos"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0" style="font-size:13px; text-align: center;">
+                                        <thead >
+                                            <tr>
+                                                <th><input type="checkbox" id="checkAll"/></th>
+                                                <th>CI</th>
+                                                <th>Nombre Completo</th>
+                                                <th>Municipio</th>
+                                                <th>Localidad</th>
+                                                <th>Tipo l</th>
+                                                <th>Fecha de contrato</th>
+                                                <th>Estado</th>
+                                                <th>Año</th>
+                                                <th>Opciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tfoot>
+                                            <tr>
+                                                <th>check</th>
+                                                <th>CI</th>
+                                                <th>Nombre Completo</th>
+                                                <th>Municipio</th>
+                                                <th>Localidad</th>
+                                                <th>Tipo l</th>
+                                                <th>Fecha de contrato</th>
+                                                <th>Estado</th>
+                                                <th>Año</th>
+                                                <th>Opciones</th>
+                                            </tr>
+                                        </tfoot>
+                                        <tbody>
+                                            <tr th:each="p,g:${listaPersonas}">
+                                                <td><input type="checkbox" name="seleccionados" th:value="${p.id_persona}"/></td>
+                                                <td th:text="${p.ci_persona}"></td>
+                                                <td th:text="${p.nombre_completo_persona}"></td>
+                                                <td th:text="${p.localidad.municipio.nombre_municipio}"></td>
+                                                <td th:text="${p.localidad.nombre_localidad}"></td>
+                                                <td
+                                                    th:text="${p.cargo.tipoCargo.nombre_tipo_cargo+'/'+p.localidad.tipoLocalidad.nombre_tipo_localidad}">
+                                                </td>
+                                                <td>
+                                                    <th:block th:if="${p.cargo.fecha_inicio!=null}">
+                                                        <div th:text="${#dates.format(p.cargo.fecha_inicio, 'dd/MM/yyyy')}  +' al '+ ${#dates.format(p.cargo.fecha_fin, 'dd/MM/yyyy')}"></div>
+                                                    </th:block>
+                                                </td>
+                                                <td th:text="${p.cargo.estadoPago.nombre_estado_pago}"></td>
+                                                <td th:text="${p.cargo.gestion.nombre_gestion}"></td>
+                                                
+
+                                                <td class="text-center" style="font-size: 15px;">
+                                                    <th:block th:if="${p.contrato!=null}">
+                                                        <a href="#" th:onclick="verContrato([[${p.contrato.id_contrato}]])"
+                                                        class="fa fa-regular fa-eye" data-toggle="tooltip" data-placement="top"
+                                                            title="Ver"></i></a><!--certificado-->
+                                                    </th:block>
+                                                    <a th:href="@{'/modificarPersona/'+${p.id_persona}}"
+                                                        data-toggle="tooltip" data-placement="top" title="Editar"><i
+                                                            class="far fa-edit"></i></a><!--editar-->
+                                                    <th:block th:if="${p.contrato==null}">
+                                                        <a href="#" th:onclick="contratar([[${p.id_persona}]])"
+                                                        class="fa fa-duotone fa-file-pen" data-toggle="tooltip" data-placement="top"
+                                                            title="Generar contrato"></a><!--certificado-->
+                                                    </th:block>
+
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </form>
                     </div>
 
                 </div>
 
+            </div>
+            <!--modal ver contrato-->
+            <div class="modal fade" tabindex="-1" id="ModalVerContrato" role="dialog"
+                aria-labelledby="myLargeModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <iframe width="800" height="600" id="iframe-pdfContrato" frameborder="0"
+                                    allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--contrato modal-->
+            <div class="modal fade" tabindex="-1" id="ModalContrato" role="dialog" aria-labelledby="myLargeModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+
+                        <form th:action="@{/generarContrato}" method="post">
+                            <input type="hidden" class="form-control" id="id_person" name="id_person"
+                                placeholder="Untitled folder" />
+                            <div class="modal-header">
+                                <h5 class="modal-title">Detalles de contrato</h5>
+                            </div>
+                            <div class="modal-body">
+
+                                <div class="form-group row">
+                                    <div class="col-md-12">
+                                        <label class="col-form-label">Fecha inicio de contrato</label>
+                                        <input class="form-control" type="date" name="fecha_inicio" required>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label class="col-form-label">Fecha fin de contrato</label>
+                                        <input class="form-control" type="date" name="fecha_fin" required>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-12 text-center">
+                                        <button type="submit" class="btn btn-primary me-1"
+                                            data-bs-dismiss="modal">Confirmar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
             <footer class="sticky-footer bg-white">
                 <div class="container my-auto">
@@ -112,6 +200,29 @@
             </div>
         </div>
     </div>
-<div th:replace="layout/pie :: pie"></div>
+    <div th:replace="layout/pie :: pie"></div>
+    <script>
+        function verContrato(id_contrato) {
+            var id_c = id_contrato;
+            $("#ModalVerContrato").modal("show");
+
+            $("#iframe-pdfContrato").attr("src", `/openFile/${id_c}`)
+        }
+        function contratar(id_persona) {
+            var id_p = id_persona;
+            $("#ModalContrato").modal("show");
+            $("#id_person").val(id_p);
+        }
+        
+    </script>
+    <script th:inline="javascript">
+        $(document).ready(function() {
+            $("#checkAll").click(function() {
+                $('input:checkbox[name="seleccionados"]').prop('checked', $(this).prop('checked'));
+            });
+        });
+    </script>
+    
 </body>
+
 </html>

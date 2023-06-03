@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="layout/head :: head">
+
+</head>
+
+<body id="page-top">
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <ul th:replace="layout/menu :: menu"></ul>
+        <div id="content-wrapper" class="d-flex flex-column">
+            <div id="content">
+                <nav th:replace="layout/cabecera :: cabecera"></nav>
+                <!--   MODIFICAR PERFIL   -->
+                <div th:replace="persona/Perfil :: ModPerfil"></div>
+                <!--   FIN MODIFICAR PERFIL   -->
+                <div class="container-fluid">
+
+                    <div class="card o-hidden border-0 shadow-lg my-5">
+                        <div class="card-body p-0">
+                            <div th:class="'alert alert-' + (${clase != null} ? ${clase} : info)" role="alert"
+                                th:if="${mensaje != null}">
+                                <h4 class="alert-body" th:text="${mensaje}"></h4>
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="row">
+                                <!--<div class="col-lg-5 d-none d-lg-block bg-register-image"></div>-->
+                                <div class="col-lg-12">
+                                    <div class="p-5">
+
+                                        <div class="text-center">
+                                            <h1 class="h4 text-gray-900 mb-5"
+                                                th:text="${editMode} ? 'Modificar Localidad '+${localidad.nombre_localidad} : 'Registrar Localidad'">
+                                            </h1>
+                                        </div>
+                                        <form class="user"
+                                            th:action="${editMode} ?@{/GuardarModLocalidad} :@{/GuardarLocalidad}"
+                                            method="post">
+                                            <input class="form-control" type="hidden"
+                                                th:field="*{localidad.id_localidad}" th:if="${editMode}">
+                                            <div class="form-group row">
+                                                <div class="col-sm-3 mb-3 mb-sm-0">
+                                                    <label for="">Nombre de la Localidad <sup>(*)</sup></label>
+                                                    <input type="text" class="form-control form-control-user"
+                                                        placeholder="Nombre de la Localidad"
+                                                        th:field="*{localidad.nombre_localidad}">
+                                                    <div style="color: red;" th:errors="*{localidad.nombre_localidad}">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <div class="col-sm-4 mb-3 mb-sm-0">
+                                                    <label for="">Municipio </label>
+                                                    <select class="form-control selectize-single"
+                                                        th:field="${localidad.municipio.id_municipio}" id="id_municipio"
+                                                        required>
+                                                        <!-- minucipios()<option selected value="">Seleccione Municipio</option>-->
+                                                        <option selected value="">Seleccione Municipio</option>
+                                                        <option th:each="m : ${municipios}" th:value="${m.id_municipio}"
+                                                            th:text="${m.nombre_municipio}"></option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-sm-4 mb-3 mb-sm-0">
+                                                    <label for="">Tipo Localidad </label>
+                                                    <select class="form-control selectize-single" id="id_localidad"
+                                                        th:field="${localidad.tipoLocalidad.id_tipo_localidad}"
+                                                        required>
+                                                        <!---->
+                                                        <option selected value="">Seleccione Tipo Localidad</option>
+                                                        <option th:each="tl : ${Tipolocalidades}"
+                                                            th:value="${tl.id_tipo_localidad} "
+                                                            th:text=" ${tl.nombre_tipo_localidad} "></option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group row mt-4 mb-3" style="text-align: center;">
+                                                <a th:class="${editMode}?'btn btn-secondary'" th:href="@{'/VLocalidad'}"
+                                                    th:text="${editMode}?'Cancelar'"></a>
+                                                <input type="submit" class="btn btn-primary"
+                                                    th:value="${editMode}?'Actualizar':'Agregar'" />
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Registro de Lodalidades</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>Nro</th>
+                                            <th>Localidad</th>
+                                            <th>Municipio</th>
+                                            <th>Area</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tfoot>
+                                        <tr>
+                                            <th>Nro</th>
+                                            <th>Localidad</th>
+                                            <th>Municipio</th>
+                                            <th>Area</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </tfoot>
+                                    <tbody>
+                                        <tr th:each="L:${localidades}" th:if="${L.estado!='X'}">
+                                            <td th:text="${L.id_localidad}"></td>
+                                            <td th:text="${L.nombre_localidad}"></td>
+                                            <td th:text="${L.municipio.nombre_municipio}"></td>
+                                            <td th:text="${L.tipoLocalidad.nombre_tipo_localidad}"></td>
+                                            <td class="text-center">
+                                                <a th:href="@{'/ModLocalidad/'+${L.id_localidad}}" data-toggle="tooltip"
+                                                    data-placement="top" title="Editar"><i
+                                                        class="far fa-edit"></i></a><!--editar-->
+                                                <a type="button" th:attr="onclick=${'MandarURL('+L.id_localidad+')'}"
+                                                    class="fa fa-trash" data-toggle="tooltip" data-placement="top"
+                                                    title="Eliminar">
+                                                </a><!--eliminar-->
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+            <footer class="sticky-footer bg-white">
+                <div class="container my-auto">
+                    <div class="copyright text-center my-auto">
+                        <span>Desarrollado por &copy; USIC - UAP 2023</span>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <a class="btn btn-primary" href="login.html">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="layout/pie :: pie"></div>
+    <script>
+        function MandarURL(a) {
+
+            Swal.fire({
+                title: 'Eliminar Registro?',
+                type: 'error',
+                showCancelButton: true,
+                showConfirmButton: false,
+                cancelButtonText: "Cancelar",
+                html:
+                    "<a type='button' class='btn btn-primary' style='display: inline-block; background-color: rgb(243, 68, 14); padding: 13px 35px 13px 35px;' href='../../../../EliminarLocalidad/" + a + "'  >" +
+                    "Eliminar" +
+                    "</a>",
+            }).then().done();
+        }
+    </script>
+</body>
+
+</html>

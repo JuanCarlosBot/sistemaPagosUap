@@ -33,5 +33,15 @@ public class PersonaServiceImpl implements IPersonaService{
     public void eliminarIdPersona(Long id_persona) {
         personaDao.deleteById(id_persona);
     }
+
+    @Override
+    public List<Persona> listarPersonasPorGestion(Long id_gestion) {
+        return personaDao.listarPersonasPorGestion(id_gestion);
+    }
+
+    @Override
+    public List<Persona> listaPersonasAllView() {
+        return personaDao.listaPersonasAllView();
+    }
     
 }

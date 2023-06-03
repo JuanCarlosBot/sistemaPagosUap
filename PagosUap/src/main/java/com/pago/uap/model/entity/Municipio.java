@@ -29,5 +29,5 @@ public class Municipio implements Serializable{
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "municipio", fetch = FetchType.LAZY)
 	private List<Localidad> localidads;
-    
+    private String estado;
 }

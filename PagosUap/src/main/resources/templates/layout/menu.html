@@ -58,15 +58,46 @@
     <li class="nav-item">
         <a class="nav-link" th:href="@{/persona}">
             <i class="fas fa-fw fa-edit"></i>
-            <span>Todas las personas</span></a>
+            <span>Registro personas</span></a>
     </li>
     <!-- Nav Item - Tables -->
+    
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities"
+            aria-expanded="true" aria-controls="collapseUtilities">
+            <i class="fas fa-fw fa-table"></i>
+            <span>Personas po Año</span>
+        </a>
+        <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities"
+            data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <h6 class="collapse-header">Personas por año:</h6>
+                <th:block th:each="g:${gestiones}">
+                    <a class="collapse-item" th:href="@{'/personaGestion/'+${g.id_gestion}}" th:text="${g.nombre_gestion}">Colors</a>
+                </th:block>
+            </div>
+        </div>
+    </li>
     <li class="nav-item">
         <a class="nav-link" th:href="@{/personasAll}">
             <i class="fas fa-fw fa-table"></i>
             <span>Todas las personas</span></a>
     </li>
-
+    <li class="nav-item">
+        <a class="nav-link" th:href="@{/Vmunicipio}">
+            <i class="fas fa-fw fa-edit"></i>
+            <span>Municipios</span></a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" th:href="@{/VLocalidad}">
+            <i class="fas fa-fw fa-edit"></i>
+            <span>Localidades</span></a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" th:href="@{/VEstadoPago}">
+            <i class="fas fa-fw fa-edit"></i>
+            <span>Estado de Pago</span></a>
+    </li>
     <!-- Divider -->
     <hr class="sidebar-divider d-none d-md-block">
 

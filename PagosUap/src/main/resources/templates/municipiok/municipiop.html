@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="layout/head :: head">
+    <!--<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.css">
+    <link rel="stylesheet" href="../../../css/selectize.bootstrap4.css">-->
+</head>
+
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <ul th:replace="layout/menu :: menu"></ul>
+        <div id="content-wrapper" class="d-flex flex-column">
+            <div id="content">
+                <nav th:replace="layout/cabecera :: cabecera"></nav>
+                <!--   MODIFICAR PERFIL   -->
+                <div th:replace="persona/Perfil :: ModPerfil"></div>
+                <!--   FIN MODIFICAR PERFIL   -->
+                <div class="container-fluid">
+
+                    <div class="card o-hidden border-0 shadow-lg my-5">
+                        <div class="card-body p-0">
+                            <div th:class="'alert alert-' + (${clase != null} ? ${clase} : info)"
+                                role="alert" th:if="${mensaje != null}">
+                                <h4 class="alert-body" th:text="${mensaje}"></h4>
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="row">
+                                <!--<div class="col-lg-5 d-none d-lg-block bg-register-image"></div>-->
+                                <div class="col-lg-12">
+                                    <div class="p-5">
+                                        
+                                        <div class="text-center">
+                                            <h1 class="h4 text-gray-900 mb-5">Crear Municipio</h1>
+                                        </div>
+                                        <form class="user" th:action="${editMode} ?@{/guardarMuncipioEditado} :@{/guardarMunicipio}" method="post">
+                                            <input class="form-control" type="hidden" th:field="*{municipio.id_municipio}" th:if="${editMode}">
+                                            <div class="form-group row">
+                                                <div class="col-sm-3 mb-3 mb-sm-0">
+                                                    <label for="">Nombre municipio <sup>(*)</sup></label>
+                                                    <input type="text" class="form-control form-control-user"
+                                                    placeholder="ttt" th:field="*{municipio.nombre_municipio}">
+                                                    <div style="color: red;" th:errors="*{municipio.nombre_municipio}"></div>
+                                                </div>
+                                               <!-- <div class="col-sm-3 mb-3 mb-sm-0">
+                                                    <label for="">Nombre(s) <sup>(*)</sup></label>
+                                                    <input type="text" class="form-control form-control-user"
+                                                    placeholder="Nombre(s)" th:field="*{persona.nombre_persona}" >
+                                                    <div style="color: red;" th:errors="*{persona.nombre_persona}"></div>
+                                                </div>
+                                                <div class="col-sm-3 mb-3 mb-sm-0">
+                                                    <label for="">Apellido Paterno <sup>(*)</sup></label>
+                                                    <input type="text" class="form-control form-control-user"
+                                                    placeholder="Apellido Paterno" th:field="*{persona.ap_paterno_persona}">
+                                                    <div style="color: red;" th:errors="*{persona.ap_paterno_persona}"></div>
+                                                </div>
+                                                <div class="col-sm-3 mb-3 mb-sm-0">
+                                                    <label for="">Apellido Materno <sup>(*)</sup></label>
+                                                    <input type="text" class="form-control form-control-user"
+                                                    placeholder="Apellido Materno" th:field="*{persona.ap_materno_persona}">
+                                                    <div style="color: red;" th:errors="*{persona.ap_materno_persona}"></div>
+                                                </div>-->
+                                            </div>
+                                            <!--<div class="form-group row">
+                                                <div class="col-sm-4 mb-3 mb-sm-0">
+                                                    <label for="">Municipio </label>
+                                                    <select class="form-control selectize-single" id="id_municipio" onchange="localidades()" required>
+                                                        <option selected value="">Seleccione Municipio</option>
+                                                        <option th:each="m : ${municipios}" th:value="${m.id_municipio}"
+                                                          th:text="${m.nombre_municipio}"></option>
+                                                      </select>
+                                                </div>
+                                                <div class="col-sm-4 mb-3 mb-sm-0">
+                                                    <label for="">Localidad </label>
+                                                    <select class="form-control" id="id_localidadd" th:field="*{persona.localidad}" required>
+                                                        <option value="">Seleccione Localidad</option>                                                        
+                                                      </select>
+                                                </div>
+                                                <div class="col-sm-4 mb-3 mb-sm-0">
+                                                    <label for="">Cargo </label>
+                                                    <select class="form-control selectize-single" id="id_tipo_cargo" name="id_tipo_cargo" required>
+                                                        <option selected value="">Seleccione cargo</option>
+                                                        <option th:each="tc : ${tipoCargos}" th:value="${tc.id_tipo_cargo}"
+                                                          th:text="${tc.nombre_tipo_cargo}"></option>
+                                                      </select>
+                                                </div>
+                                            </div>-->
+
+                                            <div class="form-group row mt-4 mb-3" style="text-align: center;">
+                                                <a th:class="${editMode}?'btn btn-secondary'" th:href="@{/Vmunicipio}" th:text="${editMode}?'Cancelar'"></a>
+									            <input type="submit" class="btn btn-primary" th:value="${editMode}?'Actualizar':'Agregar'"/>
+                                            </div>
+                                            <h1>Lista de Municipios</h1>
+                                            
+                                        </form>
+                                        <div class="card shadow mb-4">
+                                        <div class="card-header py-3">
+                                            <h6 class="m-0 font-weight-bold text-primary">Registro de Municipios</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="table-responsive">
+                                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>ID</th>
+                                                            <th>NOMBRE</th>
+                                                            <th>ACCIONES</th>
+                                                            
+                                                        </tr>
+                                                    </thead>
+                                                    <tfoot>
+                                                        <tr>
+                                                            <th>ID</th>
+                                                            <th>NOMBRE</th>
+                                                            <th>ACCIONES</th>
+                                                            
+                                                        </tr>
+                                                    </tfoot>
+                                                    <tbody>
+                                                        <tr th:each="listam : ${listaMunicipio}" th:if="${listam.estado!='X'}">
+                                                            <td th:text="${listam.id_municipio}"></td>
+                                                            <td th:text="${listam.nombre_municipio}"></td>
+                                                                                                        
+                                                            <td class="text-center">
+                                                                <a th:href="@{'/modificarMunicipio/'+${listam.id_municipio}}" 
+                                                                    data-toggle="tooltip" data-placement="top" title="Editar"><i
+                                                                    class="far fa-edit"></i></a><!--editar --> 
+                                                                <a  type="button" th:attr="onclick=${'MandarURL('+listam.id_municipio+')'}"
+                                                                class="fa fa-trash" data-toggle="tooltip" data-placement="top" title="Eliminar"></a><!--editar-->
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <footer class="sticky-footer bg-white">
+                <div class="container my-auto">
+                    <div class="copyright text-center my-auto">
+                        <span>Desarrollado por &copy; USIC - UAP 2023</span>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <a class="btn btn-primary" href="login.html">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<div th:replace="layout/pie :: pie"></div>
+    
+    <script>
+        function MandarURL(a) {
+
+            Swal.fire({
+                title: 'Eliminar Registro?',
+                type: 'error',
+                showCancelButton: true,
+                showConfirmButton: false,
+                cancelButtonText: "Cancelar",
+                html:
+                    "<a type='button' class='btn btn-primary' style='display: inline-block; background-color: rgb(243, 68, 14); padding: 13px 35px 13px 35px;' href='../../../../eliminarMunicipio/" + a + "'  >" +
+                    "Eliminar" +
+                    "</a>",
+            }).then().done();
+        }
+    </script>
+</body>
+
+</html>
