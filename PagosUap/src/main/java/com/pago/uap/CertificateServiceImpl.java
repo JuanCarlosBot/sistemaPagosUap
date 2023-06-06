@@ -46,7 +46,8 @@ public class CertificateServiceImpl implements CertificateServicee{
         String filePathh = "D:/UAP/proyecto/sistemaPagosUap/PagosUap/src/main/resources/uploads/certificados.pdf";
         MultipartFile fileFisico=convertToMultipartFile(filePathh);
         String ruta = persona.getId_persona()+"-"+config.guardarArchivo(fileFisico);
-
+        String tipoC = persona.getCargo().getTipoCargo().getNombre_tipo_cargo(); // beneficiario y lider
+        String tipoL = persona.getLocalidad().getTipoLocalidad().getNombre_tipo_localidad(); // rural o urbano
         Contrato contrato=new Contrato();
         contrato.setRuta(ruta);
         contrato.setPersona(persona);
