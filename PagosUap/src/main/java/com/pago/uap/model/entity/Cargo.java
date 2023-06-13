@@ -34,7 +34,8 @@ public class Cargo implements Serializable{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id_cargo;
     @Column
-    
+    private String numeracion;
+    @Column
     @Temporal(TemporalType.DATE)
     private Date fecha_inicio;
     @Column

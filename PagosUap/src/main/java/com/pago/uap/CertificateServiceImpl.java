@@ -96,7 +96,7 @@ public class CertificateServiceImpl implements CertificateServicee {
         // rutaParaGenerar="D:/UAP/proyecto/sistemaPagosUap/PagosUap/src/main/resources/uploads/"+contrato.getRuta();
         
         
-       
+        String numeracion = persona.getCargo().getNumeracion();
         String nombre_c = persona.getNombre_completo_persona();
         String ci = persona.getCi_persona();
         String nom_localidad = persona.getLocalidad().getNombre_localidad();
@@ -114,11 +114,11 @@ public class CertificateServiceImpl implements CertificateServicee {
         contratoService.guardarContrato(contrato);
         String rutaParaGenerar = Paths.get("").toAbsolutePath().toString() + "/PagosUap/src/main/resources/uploads/"
             + contrato.getRuta();
-        generateContract(nombre_c, ci, nom_localidad, nom_municipio, tipoL, fechainicio, fechafin, rutaParaGenerar, tipoC, 
-        numeroContrato, gestion);
+        generateContract(numeracion, nombre_c, ci, nom_localidad, nom_municipio, tipoL, fechainicio, fechafin, 
+        rutaParaGenerar, tipoC, gestion);
         }else if(persona.getContrato().size()>=1){
             Contrato contrato = new Contrato();
-        contrato.setRuta("I_"+ruta);
+        contrato.setRuta(ruta);
         contrato.setPersona(persona);
         contrato.setEstado("R");
         contratoService.guardarContrato(contrato);
@@ -127,8 +127,8 @@ public class CertificateServiceImpl implements CertificateServicee {
         String rutaParaCertificado = Paths.get("").toAbsolutePath().toString() + "/PagosUap/src/main/resources/uploads/cert-key-20230523-170937.p12";
         String rutaParaGenerar = Paths.get("").toAbsolutePath().toString() + "/PagosUap/src/main/resources/uploads/"
             + contrato.getRuta();
-        generateContractQr(contrato.getId_contrato(), nombre_c, ci, nom_localidad, nom_municipio, tipoL, fechainicio, fechafin, rutaParaGenerar, tipoC,
-        numeroContrato, gestion);
+        generateContractQr(contrato.getId_contrato(), numeracion, nombre_c, ci, nom_localidad, nom_municipio, tipoL, fechainicio, 
+        fechafin, rutaParaGenerar, tipoC, gestion);
         //String llave = "123456";
         String rutaParaGenerarF = Paths.get("").toAbsolutePath().toString() + "/PagosUap/src/main/resources/uploads/I_"
             + contrato.getRuta();
@@ -137,13 +137,14 @@ public class CertificateServiceImpl implements CertificateServicee {
             
                 sign(rutaParaCertificado, llave.toCharArray(), PdfSignatureAppearance.NOT_CERTIFIED, 
                 rutaParaGenerar, rutaParaGenerarF);
-
+            contrato.setRuta("I_"+contrato.getRuta());
+            contratoService.guardarContrato(contrato);
             
         }
     }
 
-    public static void generateContract(String nombre_c, String ci, String nom_localidad,String nom_municipio, String tipo_localidad,
-            Date fechainicio, Date fechafin, String filePath, String tipoCargo, int numeroContrato, String gestion) {
+    public static void generateContract(String numeracion, String nombre_c, String ci, String nom_localidad,String nom_municipio, String tipo_localidad,
+            Date fechainicio, Date fechafin, String filePath, String tipoCargo, String gestion) {
         // 1 pulgada = 25.4mm
         // 1 pulgada 72 puntos
         System.out.println("-------------------------METODO GENERATE CONTRACT----------------");
@@ -178,7 +179,7 @@ public class CertificateServiceImpl implements CertificateServicee {
             content.addImage(imagenFondo);
 
             // Agrega el contenido del contrato
-            addTitle(document, numeroContrato, gestion);
+            addTitle(numeracion, document, gestion);
             System.out.println("----------------------CUERPO DOCUMENTO---------------");
             addCuerpo(nombre_c, ci, nom_localidad, nom_municipio, tipo_localidad, fechainicio, fechafin, document, tipoCargo);
             addFirma(nombre_c, document);
@@ -190,8 +191,8 @@ public class CertificateServiceImpl implements CertificateServicee {
         }
     }
     
-    public static void generateContractQr(Long id_contrato, String nombre_c, String ci, String nom_localidad,String nom_municipio, String tipo_localidad,
-            Date fechainicio, Date fechafin, String filePath, String tipoCargo, int numeroContrato, String gestion) {
+    public static void generateContractQr(Long id_contrato, String numeracion, String nombre_c, String ci, String nom_localidad,String nom_municipio, String tipo_localidad,
+            Date fechainicio, Date fechafin, String filePath, String tipoCargo, String gestion) {
         // 1 pulgada = 25.4mm
         // 1 pulgada 72 puntos
         System.out.println("-------------------------METODO GENERATE CONTRACT----------------");
@@ -255,9 +256,22 @@ public class CertificateServiceImpl implements CertificateServicee {
             content.addImage(imagenFondo);
 
             // Agrega el contenido del contrato
-            addTitle(document, numeroContrato, gestion);
+            addTitle(numeracion, document, gestion);
             System.out.println("----------------------CUERPO DOCUMENTO---------------");
             addCuerpo(nombre_c, ci, nom_localidad, nom_municipio, tipo_localidad, fechainicio, fechafin, document, tipoCargo);
+            BaseFont baseFontN = BaseFont.createFont(
+                    Paths.get("").toAbsolutePath().toString()
+                            + "/PagosUap/src/main/resources/uploads/ArialNarrowBold.ttf",BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+            Font cursiv = new Font(baseFontN, 10, Font.ITALIC);
+            
+
+            Paragraph firma = new Paragraph();
+            firma.add(new Phrase(
+                "                              INCLUYE FIRMA DIGITAL\n \n",cursiv));
+            firma.setAlignment(Element.ALIGN_LEFT);
+            firma.setSpacingBefore(20);
+            firma.setSpacingAfter(-25);
+            document.add(firma);
             addFirma(nombre_c, document);
 
 
@@ -287,7 +301,7 @@ public class CertificateServiceImpl implements CertificateServicee {
         }
     }
     
-    public static void addTitle(Document document, int numeroContrato, String gestion) throws DocumentException {
+    public static void addTitle(String numeracion, Document document, String gestion) throws DocumentException {
         // 1 pulgada = 25.4mm
         // 1 pulgada 72 puntos
         try {
@@ -315,7 +329,7 @@ public class CertificateServiceImpl implements CertificateServicee {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy");
             String currentYear = currentDate.format(formatter);
 
-            Chunk boldChunk = new Chunk("Nº " + numeroContrato + "A/" + gestion );
+            Chunk boldChunk = new Chunk("Nº " + numeracion + "/" + gestion );
             title.add(boldChunk);
 
             title.setAlignment(Element.ALIGN_CENTER);
@@ -683,8 +697,7 @@ public class CertificateServiceImpl implements CertificateServicee {
             Font normal = new Font(baseFont, 11);// arial narrow normal
 
             Paragraph firma = new Paragraph();
-            firma.add(new Phrase(
-                "                              INCLUYE FIRMA DIGITAL\n \n",cursiva));
+            
             firma.add(new Phrase(
                 "                             ING. M.SC. FRANZ NAVIA MIRANDA                        Sr (a). " + nombre_c + "\n",
                     normal));

@@ -105,9 +105,14 @@
 
                                                 <td class="text-center" style="font-size: 15px;">
                                                     <th:block th:each="c:${p.contrato}" th:if="${p.contrato!=null}">
-                                                        <a href="#" th:onclick="verContrato([[${c.id_contrato}]])"
+                                                        <a th:if="${c.estado=='A'}" href="#" th:onclick="verContrato([[${c.id_contrato}]])"
                                                         class="fa fa-regular fa-eye" data-toggle="tooltip" data-placement="top"
-                                                            title="Ver"></i></a><!--certificado-->
+                                                            title="Ver" style="color: rgb(198, 212, 36);"></i></a><!--certificado sin firma-->
+                                                    </th:block>
+                                                    <th:block th:each="c:${p.contrato}" th:if="${p.contrato!=null}">
+                                                        <a th:if="${c.estado=='R'}" href="#" th:onclick="verContrato([[${c.id_contrato}]])"
+                                                        class="fa fa-regular fa-eye" data-toggle="tooltip" data-placement="top"
+                                                            title="Con firma" style="color: green;"></i></a><!--certificado con firma-->
                                                     </th:block>
                                                     <a th:href="@{'/modificarPersona/'+${p.id_persona}}"
                                                         data-toggle="tooltip" data-placement="top" title="Editar"><i
@@ -140,9 +145,14 @@
 
                                                 <td class="text-center" style="font-size: 15px;">
                                                     <th:block th:each="c:${p.contrato}" th:if="${p.contrato!=null}">
-                                                        <a href="#" th:onclick="verContrato([[${c.id_contrato}]])"
+                                                        <a th:if="${c.estado=='A'}" href="#" th:onclick="verContrato([[${c.id_contrato}]])"
                                                         class="fa fa-regular fa-eye" data-toggle="tooltip" data-placement="top"
-                                                            title="Ver"></i></a><!--certificado-->
+                                                            title="Ver" style="color: rgb(198, 212, 36);"></i></a><!--certificado sin firma-->
+                                                    </th:block>
+                                                    <th:block th:each="c:${p.contrato}" th:if="${p.contrato!=null}">
+                                                        <a th:if="${c.estado=='R'}" href="#" th:onclick="verContrato([[${c.id_contrato}]])"
+                                                        class="fa fa-regular fa-eye" data-toggle="tooltip" data-placement="top"
+                                                            title="Con firma" style="color: green;"></i></a><!--certificado con firma-->
                                                     </th:block>
                                                     <a th:href="@{'/modificarPersona/'+${p.id_persona}}"
                                                         data-toggle="tooltip" data-placement="top" title="Editar"><i
