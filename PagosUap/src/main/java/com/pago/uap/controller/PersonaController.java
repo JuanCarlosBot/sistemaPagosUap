@@ -1,5 +1,6 @@
 package com.pago.uap.controller;
 
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -57,11 +58,13 @@ public class PersonaController {
 /*  @Autowired
     private V_todo v_todo;*/
 
+    
+    
     @GetMapping(value = { "/", "/persona" })
     public String PersonaFormulario(Model model, HttpServletRequest request) {
         if (request.getSession().getAttribute("usuario") != null) {
             Usuario usuario = (Usuario) request.getSession().getAttribute("usuario");
-
+            
             model.addAttribute("usuario", usuario);
             model.addAttribute("gestiones", gestionService.listaGestionesAll());
             model.addAttribute("persona", new Persona());

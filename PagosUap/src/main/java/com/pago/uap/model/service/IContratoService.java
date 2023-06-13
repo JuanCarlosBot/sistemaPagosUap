@@ -7,4 +7,5 @@ public interface IContratoService {
     public void guardarContrato(Contrato contrato);
     public Contrato sacarIdContrato(Long id_contrato);
     public void eliminarIdContrato(Long id_contrato);
+    public int NumerarContrato(Long id_gestion);
 }

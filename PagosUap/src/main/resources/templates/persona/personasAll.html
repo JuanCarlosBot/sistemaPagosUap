@@ -23,22 +23,32 @@
                             <div class="card-header py-3">
                                 
                                 <div class="form-group row">
-                                    <div class="col-md-3">
+                                    <div class="col-md-12">
                                         <div style="text-align: left;">
                                             <h4 class="m-0 font-weight-bold text-primary">Personas</h4>
                                         </div>
                                     </div>
-                                    <div class="form-group row col-md-9">
-                                        <label class="col-form-label">Fecha inicio</label>
-                                        <div class="col-sm-3 col-md-3">
+                                    <div class="form-group row col-md-12">
+                                        <label th:if="${usuario.id_usuario==2}" class="col-form-label">Codigo</label>
+                                        <div th:if="${usuario.id_usuario==2}" class="col-sm-3 col-md-2">
+                                            <input class="form-control" type="password" name="codigo" required>
+                                        </div>
+                                        <label th:if="${usuario.id_usuario==1}" class="col-form-label">Fecha inicio</label>
+                                        <div th:if="${usuario.id_usuario==1}" class="col-sm-3 col-md-2">
                                             <input class="form-control" type="date" name="fecha_inicio" required>
                                         </div>
-                                        <label class="col-form-label">Fecha fin</label>
-                                        <div class="col-sm-3 col-md-3">
+                                        <label th:if="${usuario.id_usuario==1}" class="col-form-label">Fecha fin</label>
+                                        <div th:if="${usuario.id_usuario==1}" class="col-sm-3 col-md-2">
                                             <input class="form-control" type="date" name="fecha_fin" required>
                                         </div>
-                                        <div class="col-sm-3 col-md-3" style="text-align: left;">
-                                            <input type="submit" class="btn btn-primary" value="Generar Contratos"/>
+                                        <div class="col-sm-3 col-md-2" style="text-align: left;">
+                                            <th:block th:if="${usuario.id_usuario==1}">
+                                                <input type="submit" class="btn btn-primary" value="Generar Contratos"/>
+                                            </th:block>
+                                            <th:block th:if="${usuario.id_usuario==2}">
+                                                <input type="submit" class="btn btn-primary" value="Firmar Contratos"/>
+                                            </th:block>
+                                            
                                         </div>
                                     </div>
                                 </div>
@@ -75,7 +85,7 @@
                                             </tr>
                                         </tfoot>
                                         <tbody>
-                                            <tr th:each="p,g:${listaPersonas}">
+                                            <tr th:each="p,g:${listaPersonas}" th:if="${usuario.id_usuario==1}">
                                                 <td><input type="checkbox" name="seleccionados" th:value="${p.id_persona}"/></td>
                                                 <td th:text="${p.ci_persona}"></td>
                                                 <td th:text="${p.nombre_completo_persona}"></td>
@@ -94,15 +104,50 @@
                                                 
 
                                                 <td class="text-center" style="font-size: 15px;">
-                                                    <th:block th:if="${p.contrato!=null}">
-                                                        <a href="#" th:onclick="verContrato([[${p.contrato.id_contrato}]])"
+                                                    <th:block th:each="c:${p.contrato}" th:if="${p.contrato!=null}">
+                                                        <a href="#" th:onclick="verContrato([[${c.id_contrato}]])"
                                                         class="fa fa-regular fa-eye" data-toggle="tooltip" data-placement="top"
                                                             title="Ver"></i></a><!--certificado-->
                                                     </th:block>
                                                     <a th:href="@{'/modificarPersona/'+${p.id_persona}}"
                                                         data-toggle="tooltip" data-placement="top" title="Editar"><i
                                                             class="far fa-edit"></i></a><!--editar-->
-                                                    <th:block th:if="${p.contrato==null}">
+                                                    <th:block th:if="${p.contrato.size()==0}">
+                                                        <a href="#" th:onclick="contratar([[${p.id_persona}]])"
+                                                        class="fa fa-duotone fa-file-pen" data-toggle="tooltip" data-placement="top"
+                                                            title="Generar contrato"></a><!--certificado-->
+                                                    </th:block>
+
+                                                </td>
+                                            </tr>
+                                            <tr th:each="p,g:${listaPersonas}" th:if="${usuario.id_usuario==2} and ${p.contrato.size()==1}" >
+                                                <td><input type="checkbox" name="seleccionados" th:value="${p.id_persona}"/></td>
+                                                <td th:text="${p.ci_persona}"></td>
+                                                <td th:text="${p.nombre_completo_persona}"></td>
+                                                <td th:text="${p.localidad.municipio.nombre_municipio}"></td>
+                                                <td th:text="${p.localidad.nombre_localidad}"></td>
+                                                <td
+                                                    th:text="${p.cargo.tipoCargo.nombre_tipo_cargo+'/'+p.localidad.tipoLocalidad.nombre_tipo_localidad}">
+                                                </td>
+                                                <td>
+                                                    <th:block th:if="${p.cargo.fecha_inicio!=null}">
+                                                        <div th:text="${#dates.format(p.cargo.fecha_inicio, 'dd/MM/yyyy')}  +' al '+ ${#dates.format(p.cargo.fecha_fin, 'dd/MM/yyyy')}"></div>
+                                                    </th:block>
+                                                </td>
+                                                <td th:text="${p.cargo.estadoPago.nombre_estado_pago}"></td>
+                                                <td th:text="${p.cargo.gestion.nombre_gestion}"></td>
+                                                
+
+                                                <td class="text-center" style="font-size: 15px;">
+                                                    <th:block th:each="c:${p.contrato}" th:if="${p.contrato!=null}">
+                                                        <a href="#" th:onclick="verContrato([[${c.id_contrato}]])"
+                                                        class="fa fa-regular fa-eye" data-toggle="tooltip" data-placement="top"
+                                                            title="Ver"></i></a><!--certificado-->
+                                                    </th:block>
+                                                    <a th:href="@{'/modificarPersona/'+${p.id_persona}}"
+                                                        data-toggle="tooltip" data-placement="top" title="Editar"><i
+                                                            class="far fa-edit"></i></a><!--editar-->
+                                                    <th:block th:if="${p.contrato.size()==0}">
                                                         <a href="#" th:onclick="contratar([[${p.id_persona}]])"
                                                         class="fa fa-duotone fa-file-pen" data-toggle="tooltip" data-placement="top"
                                                             title="Generar contrato"></a><!--certificado-->
@@ -116,7 +161,6 @@
                             </div>
                         </form>
                     </div>
-
                 </div>
 
             </div>

@@ -1,12 +1,9 @@
 package com.pago.uap.model.service;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.pago.uap.model.dao.IContratoDao;
-import com.pago.uap.model.entity.Cargo;
 import com.pago.uap.model.entity.Contrato;
 
 @Service
@@ -28,6 +25,11 @@ public class ContratoServiceImpl implements IContratoService{
     @Override
     public void eliminarIdContrato(Long id_contrato) {
         contratoDao.deleteById(id_contrato);
+    }
+
+    @Override
+    public int NumerarContrato(Long id_gestion) {
+        return contratoDao.NumerarContrato(id_gestion);
     }
 
     
