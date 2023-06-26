@@ -59,6 +59,7 @@
                                         <thead >
                                             <tr>
                                                 <th><input type="checkbox" id="checkAll"/></th>
+                                                <th>Num</th>
                                                 <th>CI</th>
                                                 <th>Nombre Completo</th>
                                                 <th>Municipio</th>
@@ -73,6 +74,7 @@
                                         <tfoot>
                                             <tr>
                                                 <th>check</th>
+                                                <th>Num</th>
                                                 <th>CI</th>
                                                 <th>Nombre Completo</th>
                                                 <th>Municipio</th>
@@ -87,6 +89,7 @@
                                         <tbody>
                                             <tr th:each="p,g:${listaPersonas}" th:if="${usuario.id_usuario==1}">
                                                 <td><input type="checkbox" name="seleccionados" th:value="${p.id_persona}"/></td>
+                                                <td th:text="${p.cargo.numeracion}"></td>
                                                 <td th:text="${p.ci_persona}"></td>
                                                 <td th:text="${p.nombre_completo_persona}"></td>
                                                 <td th:text="${p.localidad.municipio.nombre_municipio}"></td>
@@ -127,6 +130,7 @@
                                             </tr>
                                             <tr th:each="p,g:${listaPersonas}" th:if="${usuario.id_usuario==2} and ${p.contrato.size()==1}" >
                                                 <td><input type="checkbox" name="seleccionados" th:value="${p.id_persona}"/></td>
+                                                <td th:text="${p.cargo.numeracion}"></td>
                                                 <td th:text="${p.ci_persona}"></td>
                                                 <td th:text="${p.nombre_completo_persona}"></td>
                                                 <td th:text="${p.localidad.municipio.nombre_municipio}"></td>

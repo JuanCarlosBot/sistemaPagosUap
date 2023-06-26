@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="layout/head :: head"></head>
+
+<body id="page-top">
+    <div id="wrapper">
+        <ul th:replace="layout/menu :: menu"></ul>
+        <div id="content-wrapper" class="d-flex flex-column">
+            <div id="content">
+                <nav th:replace="layout/cabecera :: cabecera"></nav>
+                <div class="container-fluid">
+                    <div class="card o-hidden border-0 shadow-lg my-5">
+                        <div class="card-body p-0">
+                            <div th:class="'alert alert-' + (${clase != null} ? ${clase} : info)"
+                                role="alert" th:if="${mensaje != null}">
+                                <h4 class="alert-body" th:text="${mensaje}"></h4>
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="row">
+                                <!--<div class="col-lg-5 d-none d-lg-block bg-register-image"></div>-->
+                                <div class="col-lg-12">
+                                    <div class="p-5">
+                                        
+                                        <div class="text-center">
+                                            <h1 class="h4 text-gray-900 mb-5">Generador de planillas por barrio/localidad</h1>
+                                        </div>
+                                        <form class="user" th:action="@{/generarPlanillaPost}" method="post">
+                                            
+                                            <div class="form-group row">
+                                                <div class="col-sm-4 mb-3 mb-sm-0">
+                                                    <label for="">Municipio </label>
+                                                    <select class="form-control selectize-single" id="id_municipio" onchange="localidades()" required>
+                                                        <option selected value="">Seleccione Municipio</option>
+                                                        <option th:each="m : ${municipios}" th:value="${m.id_municipio}"
+                                                          th:text="${m.nombre_municipio}"></option>
+                                                      </select>
+                                                </div>
+                                                <div class="col-sm-4 mb-3 mb-sm-0">
+                                                    <label for="">Localidad </label>
+                                                    <select class="form-control" id="id_localidadd" name="id_localidad" required>
+                                                        <option value="">Seleccione Localidad</option>                                                        
+                                                      </select>
+                                                </div>
+                                                <div class="col-sm-4 mb-3 mb-sm-0">
+                                                    <label for="">Gestion </label>
+                                                    <select class="form-control selectize-single" id="id_gestion" name="id_gestion" required>
+                                                        <option selected value="">Gestion</option>
+                                                        <option th:each="g : ${gestiones}" th:value="${g.id_gestion}"
+                                                          th:text="${g.nombre_gestion}"></option>
+                                                      </select>
+                                                </div>
+                                                
+                                            </div>
+
+                                            <div class="form-group row mt-4 mb-3" style="text-align: center;">
+                                                
+									            <input type="submit" class="btn btn-primary" value="Generar planilla"/>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card shadow mb-4">
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0" style="font-size:13px; text-align: center;">
+                                        <thead >
+                                            <tr>
+                                                <th>Municipio</th>
+                                                <th>Barrio/Localidad</th>
+                                                <th>cantidad de personas</th>
+                                                <th>Opciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tfoot>
+                                            <tr>
+                                                <th>Municipio</th>
+                                                <th>Barrio/Localidad</th>
+                                                <th>cantidad de personas</th>
+                                                <th>Opciones</th>
+                                            </tr>
+                                        </tfoot>
+                                        <tbody>
+                                            <tr th:each="l:${listaLocalidades}" th:if="${l.planillas.size()!=0}">
+                                                <td th:text="${l.municipio.nombre_municipio}"></td>
+                                                <td th:text="${l.nombre_localidad}"></td>
+                                                <td th:text="${l.planillas.size()}"></td>
+                                                <td>
+                                                    <a th:href="@{'/download/'+${l.id_localidad}}"
+                                                        data-toggle="tooltip" data-placement="top"
+                                                            title="Detalle">Detalle</a><!--certificado-->
+                                                </td>
+                                                
+                                            </tr>
+                                            
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                    </div>
+                </div>
+
+            </div>
+            <!--modal ver contrato-->
+            <div class="modal fade" tabindex="-1" id="ModalVerContrato" role="dialog"
+                aria-labelledby="myLargeModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <iframe width="800" height="600" id="iframe-pdfContrato" frameborder="0"
+                                    allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--contrato modal-->
+            <div class="modal fade" tabindex="-1" id="ModalContrato" role="dialog" aria-labelledby="myLargeModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+
+                        <form th:action="@{/generarContrato}" method="post">
+                            <input type="hidden" class="form-control" id="id_person" name="id_person"
+                                placeholder="Untitled folder" />
+                            <div class="modal-header">
+                                <h5 class="modal-title">Detalles de contrato</h5>
+                            </div>
+                            <div class="modal-body">
+
+                                <div class="form-group row">
+                                    <div class="col-md-12">
+                                        <label class="col-form-label">Fecha inicio de contrato</label>
+                                        <input class="form-control" type="date" name="fecha_inicio" required>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label class="col-form-label">Fecha fin de contrato</label>
+                                        <input class="form-control" type="date" name="fecha_fin" required>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-12 text-center">
+                                        <button type="submit" class="btn btn-primary me-1"
+                                            data-bs-dismiss="modal">Confirmar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <footer class="sticky-footer bg-white">
+                <div class="container my-auto">
+                    <div class="copyright text-center my-auto">
+                        <span>Desarrollado por &copy; USIC - UAP 2023</span>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <a class="btn btn-primary" href="login.html">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div th:replace="layout/pie :: pie"></div>
+    <script>
+        function verContrato(id_contrato) {
+            var id_c = id_contrato;
+            $("#ModalVerContrato").modal("show");
+
+            $("#iframe-pdfContrato").attr("src", `/openFile/${id_c}`)
+        }
+        function contratar(id_persona) {
+            var id_p = id_persona;
+            $("#ModalContrato").modal("show");
+            $("#id_person").val(id_p);
+        }
+        
+    </script>
+    <script th:inline="javascript">
+        $(document).ready(function() {
+            $("#checkAll").click(function() {
+                $('input:checkbox[name="seleccionados"]').prop('checked', $(this).prop('checked'));
+            });
+        });
+    </script>
+    <script type="text/javascript">
+        function localidades() {
+          var i = document.getElementById("id_municipio").value;
+          // alert(i);
+          $.getJSON("/getLocalidades", {
+            municipioId: i,
+            ajax: 'true'
+          }, function (data) {
+            var html = '<option value="">Localidades de municipio ('+data[0].municipio.nombre_municipio+') </option>';
+            var len = data.length;
+            for (var i = 0; i < len; i++) {
+              html += '<option value="' + data[i].id_localidad + '">'
+                + data[i].nombre_localidad + '</option>';
+            }
+            html += '</option>';
+            $('#id_localidadd').html(html);
+          });
+        }
+        
+    </script>
+</body>
+
+</html>

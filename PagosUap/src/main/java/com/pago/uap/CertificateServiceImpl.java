@@ -1,3 +1,4 @@
+
 package com.pago.uap;
 
 import org.springframework.web.multipart.MultipartFile;
@@ -19,7 +20,6 @@ import java.util.Locale;
 
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,11 +35,8 @@ import java.util.Map;
 //para qr
 import java.awt.image.BufferedImage;
 import java.awt.*;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
+
 import com.itextpdf.text.Image;
-import com.itextpdf.text.pdf.PdfContentByte;
-import com.itextpdf.text.pdf.PdfWriter;
 //para firma digital
 import com.itextpdf.text.pdf.security.ExternalDigest;
 import com.itextpdf.text.pdf.security.ExternalSignature;
@@ -82,6 +79,7 @@ public class CertificateServiceImpl implements CertificateServicee {
         
         Persona persona = personaService.sacarIdPersona(id_persona);
         int numeroContrato = contratoService.NumerarContrato(persona.getCargo().getGestion().getId_gestion())+1;
+        System.out.println("numero de contrato de 2023="+ numeroContrato);
         String filePathh = Paths.get("").toAbsolutePath().toString()+"/PagosUap/src/main/resources/uploads/certificados.pdf";
         // String filePathh =
         // "D:/UAP/proyecto/sistemaPagosUap/PagosUap/src/main/resources/uploads/certificados.pdf";
@@ -205,7 +203,7 @@ public class CertificateServiceImpl implements CertificateServicee {
         
         
         //entradas para qr
-        String linkQr = "http://servicios.uap.edu.bo:9797/contratos/" + id_contrato;
+        String linkQr = "http://virtual.uap.edu.bo:9797/contratos/" + id_contrato;
         String firmaRector = "FIRMA DIGITAL M.Sc. FRANZ NAVIA MIRANDA\n https://validar.firmadigital.bo/";
         int docsize = 90; // Ancho de la imagen del código QR
         int firmasize = 100; // Alto de la imagen del código QR
@@ -269,8 +267,8 @@ public class CertificateServiceImpl implements CertificateServicee {
             firma.add(new Phrase(
                 "                              INCLUYE FIRMA DIGITAL\n \n",cursiv));
             firma.setAlignment(Element.ALIGN_LEFT);
-            firma.setSpacingBefore(20);
-            firma.setSpacingAfter(-25);
+            firma.setSpacingBefore(0);
+            firma.setSpacingAfter(-30);
             document.add(firma);
             addFirma(nombre_c, document);
 
@@ -372,7 +370,7 @@ public class CertificateServiceImpl implements CertificateServicee {
                 descuento12p5 = preciototal * 0.13;// descuento del 13%
                 System.out.println("----------------------CONDICION BENEFICIARIO URBANO cobra: "+preciototal);
             }
-            if (tipo_localidad.equals("RURAL")) {
+            if (tipo_localidad.equals("RURAL") || tipo_localidad.equals("PARCELA")) {
                 preciodia = 103;
                 preciototal = dias*preciodia;
                 descuento12p5 = preciototal * 0.13;// descuento del 13%
@@ -438,7 +436,7 @@ public class CertificateServiceImpl implements CertificateServicee {
             parte1.add(boldChunk1);
 
             //String tlog = "";       
-            if (tipo_localidad.equals("RURAL")) {
+            if (tipo_localidad.equals("RURAL") && tipo_localidad.equals("PARCELA")) {
                     parte1.add(new Phrase(" vecino de la Comunidad ",normal));
                         //tlog = "rural";
             } else {
@@ -473,44 +471,86 @@ public class CertificateServiceImpl implements CertificateServicee {
             parte2.setSpacingBefore(9);
             document.add(parte2);
 
+            //para diferenciar fechas para parcela
+            SimpleDateFormat sdfparcela = new SimpleDateFormat("dd/MM/yyyy");
+            Date segundaFecha = sumardiasAFecha(fechainicio, 5);
+            String segundaFechaParcela=sdfparcela.format(segundaFecha);
+
             // ver fechas
             Paragraph parte3 = new Paragraph();
             parte3.add(new Phrase(
-                    "SEGUNA. - (OBJETO Y NATURALEZA DEL CONTRATO) ", negrita));
-                String Cargo="";
-                if (tipoCargo.equals("LIDER")) {
-                        Cargo = "Jefe de Cuadrilla";
-                } else {
-                       Cargo = "Beneficiario Comunal"; 
-                }
+                    "SEGUNDA. - (OBJETO Y NATURALEZA DEL CONTRATO) ", negrita));
+                String dif="";
+                    if (tipoCargo.equals("LIBER") && tipo_localidad.equals("URBANO")) {
+                        dif = "de Transferencia de Tecnologia ";
+                    } else {
+                        dif = ""; 
+                    }
             parte3.add(new Phrase(
                     "EL CONTRATANTE, a fin de atender necesidades específicas para el " +
                             "cumplimiento del Convenio firmado entre la Universidad Amazónica de Pando, el Fondo Nacional de Desarrollo "+
-                            "Forestal y el Ministerio de Medio Ambiente y Agua, para el cofinanciamiento del proyecto Estratégico ",
+                            "Forestal y el Ministerio de Medio Ambiente y Agua, para el cofinanciamiento del proyecto Estratégico "+dif,
                     normal));
                     
             parte3.add(new Phrase("“Desarrollo de la gestión del conocimiento en prácticas sustentables y adopción de tecnologías en sistemas agroforestales en 14 municipios del departamento de Pando”",cursiva));
-            parte3.add(new Phrase(", se contrata los servicios manuales diarios por jornal, para que preste servicios en el Componente de Capacitación y Asistencia Técnica como ",normal));
+            String car="";
+                if (tipoCargo.equals("LIDER") && tipo_localidad.equals("URBANO")) {
+                        car = "como Jefe de Cuadrilla";
+                } else {
+                       car = "como Beneficiario"; 
+                }
+            parte3.add(new Phrase(", se contrata los servicios manuales diarios por jornal, para que preste servicios "+car+" en el Componente de Capacitación y Asistencia Técnica ",normal));
 
         String tlog = "";       
         if (tipo_localidad.equals("RURAL")) {
                 parte3.add(new Phrase(
-                    "Beneficiario Rural-",
+                    "como Beneficiario Rural-",
                     negrita));
-                    tlog = "en el area rural";
-        } else {
+                    tlog = " del area rural";
+        } else if (tipo_localidad.equals("PARCELA") && tipoCargo.equals("BENEFICIARIO")) {
                 parte3.add(new Phrase(
-                    "Beneficiario Urbano-",
+                    "para la Implementacion de una Parcela Demostrativa",
                     normal));
-                    tlog = "en el area urbana";
+                    tlog = " del area rural";
+        } else if(tipo_localidad.equals("URBANO") && tipoCargo.equals("BENEFICIARIO")){
+                parte3.add(new Phrase(
+                    "como Beneficiario Urbano-",
+                    normal));
+                    tlog = " del area urbana";
         }
-            parte3.add(new Phrase(nom_localidad, negrita));
-            parte3.add(new Phrase(
-                    tlog+" de "+nom_municipio+", computables a partir de ",
-                    normal));
-            parte3.add(new Phrase(fechai + " hasta el " + fechaf, negrita));
-            parte3.add(new Phrase(
-                    " haciendo un total de " + dias + " dias computables.", normal));
+        String carLider="";
+                if (tipoCargo.equals("LIDER") && tipo_localidad.equals("URBANO")) {
+                        carLider = " en la Junta Vecinal ";
+                } else {
+                       carLider = " en la Comunidad "; 
+                }
+            parte3.add(new Phrase(carLider, normal));
+            parte3.add(new Phrase(" "+nom_localidad, negrita));
+            if (tipoCargo.equals("LIDER") && tipo_localidad.equals("URBANO")) {
+                parte3.add(new Phrase(
+                tlog+" de "+nom_municipio+", participación al evento de capacitación a Jefe de Cuadrilla y ejecución de la Asistencia Técnica Grupo ¨B¨ del ",
+                normal));
+                parte3.add(new Phrase(fechai + " hasta el " + fechaf, negrita));
+                parte3.add(new Phrase(
+                " haciendo un total de " + dias + " dias computables, como resultado de su labor diaria deberá rendir informes de actividades desarrolladas cuando así, se le requiera.", normal));
+            }else  if (tipoCargo.equals("BENEFICIARIO") && tipo_localidad.equals("PARCELA")) {
+                parte3.add(new Phrase(
+                tlog+" por; "+dias+" ("+textodias+") dias de trabajo que estaran computables en: 5 (cinco) dias para la Limpieza y Preparación de Parcela del ",
+                normal));
+                parte3.add(new Phrase(fechai, negrita));
+                parte3.add(new Phrase(", 5 (cinco) días para Replanteo y Transplante de Plantines del ", normal));
+                parte3.add(new Phrase(segundaFechaParcela, negrita));
+                parte3.add(new Phrase(" y 4 (cuatro) días de Labores Culturales de Parcelas del ", normal));
+                parte3.add(new Phrase(fechaf, negrita));
+                parte3.add(new Phrase(". Y como resultado de su labor, se tendrá una parcela demostrativa destinada a la implementación de los sistemas agroforestales.", normal));
+                }else {
+                 parte3.add(new Phrase(
+                        tlog+" de "+nom_municipio+", computables a partir de ",
+                        normal));
+                parte3.add(new Phrase(fechai + " hasta el " + fechaf, negrita));
+                parte3.add(new Phrase(
+                " haciendo un total de " + dias + " dias computables.", normal));
+                }
             parte3.setAlignment(Element.ALIGN_JUSTIFIED);
             parte3.setLeading(12.3f);// salto entre lineas de texto
             parte3.setSpacingBefore(9);// salto antes de parrafo
@@ -553,7 +593,7 @@ public class CertificateServiceImpl implements CertificateServicee {
                     "Bs. " + redondear(descuento12p5), negrita));
             double deparaText = redondear(descuento12p5);
             String descuento12p5texto = convertirDoubleATexto(deparaText);
-            if (tipo_localidad.equals("RURAL")) {
+            if (tipo_localidad.equals("RURAL") || tipo_localidad.equals("PARCELA")) {
                 parte5.add(new Phrase(
                         " (" + descuento12p5texto + " bolivianos), retención del IT que corresponden al 3% que equivale a ",
                         normal));
@@ -572,11 +612,19 @@ public class CertificateServiceImpl implements CertificateServicee {
                     "Bs. " + redondear(liquidoPagable), negrita));
             double liquidoPagableparaText = redondear(liquidoPagable);
             String liquidoPagabletexto = convertirDoubleATexto(liquidoPagableparaText);
-            parte5.add(new Phrase(
+            String finalcuarta="";
+                if ((tipoCargo.equals("LIDER") && tipo_localidad.equals("URBANO")) || (tipoCargo.equals("BENEFICIARIO") && tipo_localidad.equals("PARCELA"))) {
+                        finalcuarta = ", previo informe técnico, del Técnico del Proyecto por el servicio encomendados a satisfacción.";
+                } else {
+                       finalcuarta = "."; 
+                }
+                
+                
+                parte5.add(new Phrase(
                     " (un " + liquidoPagabletexto
                             + " bolivianos), por lo que dicho importe será pagado una vez completado " +
                             "los " + dias
-                            + " días de trabajo.",
+                            + " días de trabajo"+finalcuarta,
                     normal));
             parte5.setAlignment(Element.ALIGN_JUSTIFIED);
             parte5.setLeading(12.3f);
@@ -588,20 +636,40 @@ public class CertificateServiceImpl implements CertificateServicee {
                     "QUINTA. - (ENCARGADO) ", negrita));
             String lider = "";       
             if (tipo_localidad.equals("RURAL")) {
-                tlog = "Líder Comunal encargado de la Comunidad ";
-            } else {
-                tlog = "Jefe de cuadrilla encargado de la Junta Vecinal ";
+                lider = "designará a un Líder Comunal encargado de la Comunidad ";
+            }else if (tipo_localidad.equals("PARCELA")) {
+                lider = "designará a un técnico responsable encargado de supervisar el cumplimiento, satisfacción y elaborar un informe técnico"+
+                " de las actividades en la implementación de la parcela demostrativa por el CONTRATADO.";
+            }else if(tipo_localidad.equals("URBANO") && tipoCargo.equals("BENEFICIARIO")){
+                lider = "designará a un Jefe de cuadrilla encargado de la Junta Vecinal ";
             }
+            if(!tipoCargo.equals("LIDER") && tipo_localidad.equals("URBANO")){
+                parte6.add(new Phrase(
+                    "EL CONTRATANTE, mediante la coordinación del Proyecto "+lider, normal));
+             }if(tipoCargo.equals("BENEFICIARIO") && tipo_localidad.equals("PARCELA")){
+                parte6.add(new Phrase(
+                    "EL CONTRATANTE, mediante la coordinación del Proyecto "+lider, normal));
+             }  else {
+                parte6.add(new Phrase(
+                    "EL CONTRATANTE, mediante la coordinación del Proyecto, lo designará como Jefe de Cuadrilla encargado de la Junta Vecinal ", normal));
+            }
+            if(!tipoCargo.equals("BENEFICIARIO") && !tipo_localidad.equals("PARCELA")){
             parte6.add(new Phrase(
-                    "mediante la coordinación del Proyecto designará a un "+lider, normal));
-            parte6.add(new Phrase(nom_localidad, negrita));
-            parte6.add(new Phrase(
-                    " donde se desarrollará la asistencia técnica (servicios manuales), conforme las " +
+                    "donde se desarrollará la asistencia técnica (servicios manuales), conforme las " +
                             "actividades contempladas en el proyecto, el mismo que será encargado de supervisar el cumplimiento y satisfacción "
                             +
                             "de los informes de actividades desarrolladas por el CONTRATADO, así como resultado " +
                             "de los servicios pactados en el contrato.",
                     normal));
+            }else{
+                
+                parte6.add(new Phrase(
+                    "por su lado la Comunidad ", normal));
+                parte6.add(new Phrase(nom_localidad,negrita));
+                parte6.add(new Phrase(" designará un beneficiario responsable comunal para la coordinación de la asistencia técnica "+
+                    "(servicios manuales), conforme las actividades completadas en el proyecto.",
+                    normal));
+            }
             parte6.setAlignment(Element.ALIGN_JUSTIFIED);
             parte6.setLeading(12.3f);
             parte6.setSpacingBefore(9);
@@ -716,6 +784,30 @@ public class CertificateServiceImpl implements CertificateServicee {
 
     }
 
+    public static Date sumardiasAFecha(Date fecha_inicio, int numerodias){
+        Calendar calendar = Calendar.getInstance();
+
+        // Establecer la fecha inicial
+        calendar.setTime(fecha_inicio); 
+
+        // Sumar 5 días, excluyendo sábados y domingos
+        int diasSumados = 0;
+        while (diasSumados < numerodias) {
+            calendar.add(Calendar.DAY_OF_MONTH, 1);
+            int diaDeLaSemana = calendar.get(Calendar.DAY_OF_WEEK);
+            if (diaDeLaSemana != Calendar.SATURDAY && diaDeLaSemana != Calendar.SUNDAY) {
+                diasSumados++;
+            }
+        }
+
+        // Obtener la nueva fecha después de sumar los días
+        Date nuevaFecha = calendar.getTime();
+
+        // Imprimir la nueva fecha
+        System.out.println("Nueva fecha: " + nuevaFecha);
+        return nuevaFecha;
+    }
+
     public static void sign(String keystore, char[] password, int level, String src, String dest)
 			throws GeneralSecurityException, IOException, DocumentException {
 
@@ -796,10 +888,12 @@ public class CertificateServiceImpl implements CertificateServicee {
     public static String convertirDoubleATexto(double numero) {
         RuleBasedNumberFormat formatter = new RuleBasedNumberFormat(new Locale("es"), RuleBasedNumberFormat.SPELLOUT);
         int parteEntera = (int) numero;
-        int parteDecimal = (int) Math.round((numero - parteEntera) * 100); // Obtener los dos dígitos decimales
+        double parteDecimal = (numero - parteEntera);
+        parteDecimal = Math.round(parteDecimal * 100); // Redondear a dos decimales
         String parteEnteraTexto = formatter.format(parteEntera);
-        // String parteDecimalTexto = formatter.format(parteDecimal);
-        return parteEnteraTexto + " con " + parteDecimal + "/100";
+        String parteDecimalTexto = String.format("%02d", (int) parteDecimal); // Convertir a texto con dos dígitos
+        return parteEnteraTexto + " con " + parteDecimalTexto + "/100";
+    
     }
 
     public static String con(String fechaTexto) {

@@ -33,5 +33,10 @@ public class CargoServiceImpl implements ICargoService{
     public void eliminarIdCargo(Long id_cargo) {
         cargoDao.deleteById(id_cargo);
     }
+
+    @Override
+    public int numerarPorGestion(Long id_gestion) {
+        return cargoDao.numerarPorGestion(id_gestion);
+    }
     
 }

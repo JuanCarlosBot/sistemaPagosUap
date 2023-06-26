@@ -146,7 +146,7 @@
         var len = data.length;
         for (var i = 0; i < len; i++) {
           html += '<option value="' + data[i].id_localidad + '">'
-            + data[i].nombre_localidad + '</option>';
+            + data[i].nombre_localidad +' ('+data[i].tipoLocalidad.nombre_tipo_localidad +')'+ '</option>';
         }
         html += '</option>';
         $('#id_localidadd').html(html);

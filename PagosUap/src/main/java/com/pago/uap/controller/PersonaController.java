@@ -31,6 +31,7 @@ import com.pago.uap.model.entity.Persona;
 import com.pago.uap.model.entity.TipoCargo;
 import com.pago.uap.model.entity.Usuario;
 import com.pago.uap.model.service.ICargoService;
+import com.pago.uap.model.service.IContratoService;
 import com.pago.uap.model.service.IEstadoPagoService;
 import com.pago.uap.model.service.IGestionService;
 import com.pago.uap.model.service.ILocalidadService;
@@ -55,6 +56,8 @@ public class PersonaController {
     private ITipoCargoService tipoCargoService;
     @Autowired
     private IGestionService gestionService;
+    @Autowired
+    private IContratoService contratoService;
 /*  @Autowired
     private V_todo v_todo;*/
 
@@ -111,6 +114,8 @@ public class PersonaController {
             @PathVariable(value = "id_gestion") Long id_gestion, Model model, HttpServletRequest request) {
         if (request.getSession().getAttribute("usuario") != null) {
             Usuario usuario = (Usuario) request.getSession().getAttribute("usuario");
+
+            
 
             model.addAttribute("usuario", usuario);
             model.addAttribute("gestiones", gestionService.listaGestionesAll());
@@ -171,11 +176,29 @@ public class PersonaController {
 
             EstadoPago estadoPago = estadoPagoService.sacarIdEstadoPago(2l);
 
+            //contrar personas por anio
+            int numeroContrato = cargoService.numerarPorGestion(gestionA.getId_gestion())+1;
+            String contratoString = String.valueOf(numeroContrato);
+            int cantidadDigitos = contratoString.length();
+            String textoNumeracion="";
+            if (cantidadDigitos==1) {
+                textoNumeracion="000"+contratoString;
+            }else if (cantidadDigitos==2) {
+                textoNumeracion="00"+contratoString;
+            }else if (cantidadDigitos==3) {
+                textoNumeracion="0"+contratoString;
+            }
+            else if (cantidadDigitos>=4) {
+                textoNumeracion=contratoString;
+            }
+            System.out.println("numero de personas por 2023="+ textoNumeracion);
+
+
             Cargo cargo = new Cargo();
             cargo.setEstadoPago(estadoPago);
             cargo.setTipoCargo(tipoCargo);
             cargo.setGestion(gestionA);
-            cargoService.guardarCargo(cargo);
+            cargo.setNumeracion(textoNumeracion);
             cargoService.guardarCargo(cargo);
 
             persona.setNombre_completo_persona(persona.getAp_paterno_persona() + " " + persona.getAp_materno_persona()

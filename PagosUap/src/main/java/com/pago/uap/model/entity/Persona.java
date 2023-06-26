@@ -85,4 +85,8 @@ public class Persona implements Serializable{
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "persona", fetch = FetchType.LAZY)
 	private List<Contrato> contrato;
+
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "persona", fetch = FetchType.LAZY)
+	private List<Planilla> planillas;
 }

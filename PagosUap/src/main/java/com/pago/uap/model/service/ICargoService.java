@@ -10,4 +10,5 @@ public interface ICargoService {
     public void guardarCargo(Cargo cargo);
     public Cargo sacarIdCargo(Long id_cargo);
     public void eliminarIdCargo(Long id_cargo);
+    public int numerarPorGestion(Long id_gestion);
 }
